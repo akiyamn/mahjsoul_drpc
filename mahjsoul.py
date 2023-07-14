@@ -8,7 +8,8 @@ import time
 URL_MATCH = "https://mahjongsoul.game.yo-star.com"
 CLIENT_ID = "1100743919324635218"
 RPC_IMAGE = "ichihime-rage"
-SLEEP_SECONDS = 30
+BROWSER_POLL_SECONDS = 30
+DISCORD_POLL_SECONDS = 30
 
 class Tab:
     def __init__(self, title, url):
@@ -68,7 +69,14 @@ def set_rich_presence(rpc, start_time):
 def main():
     print("MahjongSoul RPC script init")
     rpc = Presence(CLIENT_ID)
-    rpc.connect()
+    while True:
+        try:
+            rpc.connect()
+        except ConnectionRefusedError:
+            time.sleep(DISCORD_POLL_SECONDS)
+            continue
+        break
+        
     print("Discord RPC connected")
     start_time = None
     while True:
@@ -80,7 +88,7 @@ def main():
             else:
                 rpc.clear()
                 start_time = None
-            time.sleep(SLEEP_SECONDS)
+            time.sleep(BROWSER_POLL_SECONDS)
         except KeyboardInterrupt:
             break
     print("Closing RPC client...")
